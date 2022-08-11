@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'maven-publish'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'edu.sc.seis.launch4j' version '2.5.1'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+group 'com.mj'
+version '1.0.1'
+
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.mj.sbo.Main'
+    }
+    destinationDir new File("C:\\Users\\mj\\Desktop\\SBot")
+}
+
+javafx{
+    version = '17.0.0.1'
+    modules = [ 'javafx.swing', 'javafx.web' ]
+}
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven { url = 'https://europe-maven.pkg.dev/jxbrowser/releases' }
+}
+compileJava.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('Listeners.java') {
+        expand props
+    }
+}
+
+
+launch4j {
+    jar = "C:\\Users\\mj\\Desktop\\SBot\\SpoonBot-"+this.version+"-all.jar"
+    mainClassName = 'com.mj.sbo.Main'
+    version = this.version;
+    outfile = "SBo-${version}.exe"
+    jvmOptions = [ '-Dfile.encoding=UTF-8' ]
+    icon = "C:\\Users\\mj\\Documents\\GitHub\\SpoonBot\\src\\main\\resources\\fileIcon.icon"
+}
+shadowJar {
+    mainClassName = 'com.mj.sbo.Main'
+    mergeServiceFiles()
+    destinationDirectory = file("C:\\Users\\mj\\Desktop\\SBo")
+}
+
+dependencies {
+//    implementation 'org.apache.poi:poi:5.0.0'
+//    implementation 'org.apache.poi:poi-ooxml:5.0.0'
+    implementation 'org.openjfx:javafx-swing:17.0.0.1'
+    implementation 'org.openjfx:javafx-web:17.0.0.1'
+    implementation group: 'javazoom', name: 'jlayer', version: '1.0.1'
+    implementation group: 'org.xerial', name: 'sqlite-jdbc', version: '3.23.1'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0'
+}

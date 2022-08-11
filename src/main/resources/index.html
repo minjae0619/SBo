@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang=ko xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Code Editor</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/nanumgothiccoding.css"/>
+</head>
+<body style="margin:0;">
+<div id="monaco" style="height:100vh"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs/loader.js"></script>
+<script>
+    var editor;
+    let linesToDisable = [1,2,3];
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs' }});
+    require(['vs/editor/editor.main'], function() {
+      editor = monaco.editor.create(document.getElementById('monaco'), {
+        theme: 'vs-dark',
+        fontFamily: ["courier", "monospace"],
+        automaticLayout: true,
+        language: 'java',
+        minimap: false,
+        scrollBeyondLastLine: false,
+        value:'%s'
+      });
+    });
+    let didScrollChangeDisposable = editor.onDidScrollChange(function() {
+    didScrollChangeDisposable.dispose();
+    setTimeout(function() {
+      $(".monaco-editor .view-lines > div").each(function(i) {
+        if(linesToDisable.includes(i+1)) {
+          $(this).css("display","none");
+          $(this).css("pointer-events","none");
+        }
+      });
+    },1000);
+    });
+    function getText() {
+       return window.editor.getValue()
+    }
+</script>
+</body>
+</html>
