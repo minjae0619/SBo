@@ -1,13 +1,5 @@
 package com.mj.sbo.ui;
 
-import com.mj.sbo.Main;
-import com.mj.sbo.objects.Bot;
-import com.mj.sbo.objects.login.AppleLogin;
-import com.mj.sbo.objects.login.EmailLogin;
-import com.mj.sbo.objects.login.FacebookLogin;
-import com.mj.sbo.objects.login.PhoneLogin;
-import com.mj.sbo.storage.DatabaseType;
-import com.mj.sbo.storage.Databases;
 import com.mj.sbo.utils.Resource;
 import com.mj.sbo.utils.log.LogType;
 import com.mj.sbo.utils.log.Logger;
@@ -22,17 +14,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class CodeScreen extends JFrame {
 
 
-    private JFXPanel jfxPanel = new JFXPanel();
+    private final JFXPanel jfxPanel = new JFXPanel();
     private WebView webView;
     private WebEngine webEngine;
     private Group group = new Group();
@@ -47,7 +39,7 @@ public class CodeScreen extends JFrame {
         setSize(1400, 760);
         setTitle("SBO");
 //        setLayout(new BoxLayout(1));//new GridLayout()
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
 
             webView = new WebView();
             group = new Group();
@@ -62,66 +54,6 @@ public class CodeScreen extends JFrame {
             webEngine.loadContent(text);
         });
     }
-    public String getJavaCode(){
-        return (String) webEngine.executeScript("getText()");
-
-    }
-    public void view() {
-        jfxPanel.setBounds(625, 0, 760, 740);
-        add(jfxPanel);
-        this.getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Platform.runLater(()->{
-                    String text = getJavaCode();
-                    Resource.writeJavaCode(text);
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            OutputStream outputStream = Resource.readJavaCode();
-                            if(outputStream.toString().equals(""))
-                                Logger.log(LogType.INFO, "코드 저장완료");
-                            else
-                                Logger.log(LogType.ERROR, outputStream.toString());
-                            timer.cancel();
-                        }
-                    }, 500);
-                });
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_S,KeyEvent.CTRL_DOWN_MASK),JComponent.WHEN_IN_FOCUSED_WINDOW );
-
-
-        this.getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Platform.runLater(()->{
-                    String text = (String) webEngine.executeScript("window.editor.getModel().getValueInRange(window.editor.getSelection())");
-                    if(text.equals(""))
-                        return;
-                    StringSelection stringSelection = new StringSelection(text);
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    clipboard.setContents(stringSelection, null);
-                });
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_C,KeyEvent.CTRL_DOWN_MASK),JComponent.WHEN_IN_FOCUSED_WINDOW );
-
-        this.getRootPane().registerKeyboardAction(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Platform.runLater(()->{
-                    String text = (String) webEngine.executeScript("window.editor.getModel().getValueInRange(window.editor.getSelection())");
-                    if(text.equals(""))
-                        return;
-                    StringSelection stringSelection = new StringSelection(text);
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    clipboard.setContents(stringSelection, null);
-                });
-            }
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_D,KeyEvent.CTRL_DOWN_MASK),JComponent.WHEN_IN_FOCUSED_WINDOW );
-
-        setVisible(true);
-    }
 
     public static void sleep(long millis) {
 
@@ -130,6 +62,68 @@ public class CodeScreen extends JFrame {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getJavaCode() {
+        return (String) webEngine.executeScript("getText()");
+
+    }
+
+    public void view() {
+        jfxPanel.setBounds(625, 0, 760, 740);
+        add(jfxPanel);
+        this.getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Platform.runLater(() -> {
+                    String text = getJavaCode();
+                    Resource.writeJavaCode(text);
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            OutputStream outputStream = Resource.readJavaCode();
+                            if (outputStream.toString().equals(""))
+                                Logger.log(LogType.INFO, "코드 저장완료");
+                            else
+                                Logger.log(LogType.ERROR, outputStream.toString());
+                            timer.cancel();
+                        }
+                    }, 500);
+                });
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+
+        this.getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Platform.runLater(() -> {
+                    String text = (String) webEngine.executeScript("window.editor.getModel().getValueInRange(window.editor.getSelection())");
+                    if (text.equals(""))
+                        return;
+                    StringSelection stringSelection = new StringSelection(text);
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clipboard.setContents(stringSelection, null);
+                });
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        this.getRootPane().registerKeyboardAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Platform.runLater(() -> {
+                    String text = (String) webEngine.executeScript("window.editor.getModel().getValueInRange(window.editor.getSelection())");
+                    if (text.equals(""))
+                        return;
+                    StringSelection stringSelection = new StringSelection(text);
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    clipboard.setContents(stringSelection, null);
+                });
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_DOWN_MASK), JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        setVisible(true);
     }
 
 }
